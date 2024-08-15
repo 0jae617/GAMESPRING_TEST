@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/chatpage.css">
+    <title>SpringCHAT - chatpage</title>
+</head>
+
+<body>
+    <h1>SpringCHAT</h1>
+    <div id="sessionId"> </div>
+    <br>
+    <div>
+        <button id="chatBtn">Chat</button>
+        <button id="usersBtn">Users</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+    <div id="chat-container">
+        <div id="chatbox">
+            <ul id="messages"></ul>
+            <form id="messageForm">
+                <input id="messageInput" autocomplete="off">
+                <button id="sendMessage" type="button">Send</button>
+            </form>
+        </div>
+
+        <div id="userbox">
+            <h2>현재: <span id="userCount">0</span>명</h2>
+            <ul id="userList"></ul>
+        </div>
+    </div>
+
+    <div id="users-container">
+        <div id="usersbox">
+            <ul id="users"></ul>
+        </div>
+    </div>
+
+    <!-- 소켓 작동 JS -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="../static/JS/chatpage.js"></script>
+</body>
+
+</html>

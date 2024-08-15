@@ -1,0 +1,73 @@
+h1 {
+    color: rgb(13, 4, 70);
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 45px;
+}
+
+#dm-container {
+    display: flex;
+    height: 180vh;
+}
+#dmbox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 상단 메시지와 하단 입력 칸 사이의 공간을 분배 */
+    width: 100%;
+    max-width: 400px;
+    height: 70vh;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+#messageForm {
+    display: flex;
+}
+#messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    padding-right: 10px;
+    list-style-type: none;
+}
+#messageInput {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-right: 8px;
+}
+
+#sendBtn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+#messages li {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.my-message {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+}
+.other-message {
+    background-color: #fff;
+    align-self: flex-start;
+}
+
+#sendBtn:hover {
+    background-color: #0056b3;
+}
+
+#logoutBtn {
+    color: red;
+}
+#usersBtn {
+    background-color: blue;
+    color: white;
+}

@@ -1,0 +1,130 @@
+h1 {
+    color: rgb(13, 4, 70);
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 45px;
+}
+#chat-container {
+    display: flex;
+}
+
+#chatbox {
+    display: none;                /* 기본적으로 채팅창 안보임 */
+    border: 1px solid blue;
+    padding: 10px;
+    width: 400px;
+    height: 400px;
+    overflow-y: scroll;
+    margin-top: 20px;
+}
+#messageForm {
+    margin-top: 10px;
+}
+#messages {
+    list-style-type: none;
+    padding: 0;
+}
+#messages li {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+.system-message {
+    color: green; /* 입장 및 퇴장 메시지의 텍스트 색상 */
+}
+
+#userbox {
+    display: none;
+    border: 1px solid blue;
+    padding: 10px;
+    width: 200px;
+    height: 400px;
+    overflow-y: scroll;
+    margin-top: 20px;
+    margin-left: 10px;
+}
+#userList {
+    list-style-type: none;
+    padding: 0;
+}
+#userList li {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+#users-container {
+    display: flex;
+}
+#usersbox {
+    display: none;
+    border: 1px solid blue;
+    padding: 10px;
+    width: 632px;
+    height: 400px;
+    overflow-y: scroll;
+    margin-top: 20px;
+}
+
+#usersbox ul {
+    list-style-type: none; /* 기본 목록 스타일 제거 */
+    padding: 0;
+}
+
+
+.user-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-item:last-child {
+    margin-bottom: 0;
+}
+
+.user-item:hover {
+    background-color: #e0e0e0;
+}
+
+.user-action-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.user-action-btn:hover {
+    background-color: #0056b3;
+}
+
+#dmbox {
+    display: none;
+    border: 1px solid blue;
+    padding: 10px;
+    width: 632px;
+    height: 400px;
+    overflow-y: scroll;
+    margin-top: 20px;
+}
+#dmMessages {
+    list-style-type: none;
+    padding: 0;
+}
+#dmMessages li {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+
+.active {
+    background-color: blue;
+    color: white;
+}
+
+#logoutBtn {
+    color: red;
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/dmpage.css">
+    <title>SpringCHAT - DM Page</title>
+</head>
+<body>
+    <h1>SpringCHAT</h1>
+    <div id="sessionId"> </div>
+    <br>
+    <div id="menu">
+        <button id="chatBtn">Chat</button>
+        <button id="usersBtn">Users</button>
+        <button id="logoutBtn">Logout</button>
+    </div>
+    <br>
+
+    <div id="dm-container">
+        <div id="dmbox">
+            <ul id="messages"></ul>
+            <form id="messageForm">
+                <input id="messageInput" autocomplete="off">
+                <button id="sendBtn" type="button">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/static/JS/dmpage.js"></script>
+</body>
+</html>
