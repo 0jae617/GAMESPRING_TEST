@@ -31,11 +31,14 @@ const userList = document.getElementById('userList');
 
 
 // 메세지 띄우기 함수
-function appendMessage(message, isSystemMessage = false){
+function appendMessage(message, isSystemMessage = false, isPrivate){
     const item = document.createElement('li');
     item.textContent = message;
     if(isSystemMessage){
         item.classList.add('system-message'); // system-message 클래스 부여 -> css 통해 초록색으로
+    }
+    if(isPrivate){
+        item.classList.add('private-message'); // system-message 클래스 부여 -> css 통해 초록색으로
     }
     messages.appendChild(item);
     chatbox.scrollTop = chatbox.scrollHeight;
@@ -69,8 +72,8 @@ document.getElementById('chatBtn').onclick = function(){
         userbox.style.display = 'block';  // 접속자 보이기
     }
 
-    socket.on('chat message', function({ message, isSystem }){
-        appendMessage(message, isSystem);
+    socket.on('chat message', function({ message, isSystem, isPrivate }){
+        appendMessage(message, isSystem, isPrivate);
     });
 
     socket.on('user update', (data) => {
@@ -81,11 +84,23 @@ document.getElementById('chatBtn').onclick = function(){
 
 // Chat 메세지 전송 함수 (send 버튼)
 document.getElementById('sendMessage').onclick = function(){
-    const message = messageInput.value;
+    const message = messageInput.value.trim();
+
     if(message && socket){
-        socket.emit('chat message', { username, message }); // 서버로 메시지 전송
-        messageInput.value = '';                            // 입력 필드 비우기
+        if(message.startsWith('/귓속말 ')){     // 귓속말 보내기 조건
+            const parts = message.split(' ');
+            const targetUserId = parts[1];    // userId 저장
+            const privateMessage = parts.slice(2).join(' '); // 나머지는 대화 내용
+            
+            socket.emit('whisper', { targetUserId, username, privateMessage });
+            messageInput.value = '';
+        }
+        else{
+            socket.emit('chat message', { username, message }); // 서버로 메시지 전송
+            messageInput.value = '';
+        }
     }
+
 };
 
 // Chat 메세지 전송 함수 (enter키)
@@ -93,8 +108,18 @@ messageForm.addEventListener('submit', function(event){
     event.preventDefault();
     const message = messageInput.value;
     if(message && socket){
-        socket.emit('chat message', { username, message });
-        messageInput.value = '';
+        if(message.startsWith('/귓속말 ')){     // 귓속말 보내기 조건
+            const parts = message.split(' ');
+            const targetUserId = parts[1];    // userId 저장
+            const privateMessage = parts.slice(2).join(' '); // 나머지는 대화 내용
+            
+            socket.emit('whisper', { targetUserId, username, privateMessage });
+            messageInput.value = '';
+        }
+        else{
+            socket.emit('chat message', { username, message }); // 서버로 메시지 전송
+            messageInput.value = '';
+        }
     }
 });
 
@@ -164,5 +189,19 @@ document.getElementById('usersBtn').onclick = function(){
 // "logout" 버튼 클릭 시
 document.getElementById('logoutBtn').onclick = function(){
     leaveChat();
-    window.location.href = '/';             // 초기 화면으로 이동
+    fetch('/getlogOut', { method: 'GET' })
+        .then(response => {
+            if(response.ok){
+                window.location.href = '/';
+            }else{
+                console.error('Failed to log out');
+            }
+        }
+    )
+    .catch(error => console.error('Error during logout:', error));
 }
+
+// 페이지 나갈 시에도 로그아웃
+window.addEventListener('beforeunload', function(event){
+    fetch('/getlogOut', { method: 'GET', keepalive: true });
+});

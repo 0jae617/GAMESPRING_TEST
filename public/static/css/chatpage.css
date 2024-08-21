@@ -30,6 +30,9 @@ h1 {
 .system-message {
     color: green; /* 입장 및 퇴장 메시지의 텍스트 색상 */
 }
+.private-message {
+    color: purple; /* 입장 및 퇴장 메시지의 텍스트 색상 */
+}
 
 #userbox {
     display: none;

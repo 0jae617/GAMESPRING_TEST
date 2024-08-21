@@ -16,20 +16,57 @@ exports.getIndex = (req, res) => {
 // 로그인 실행
 exports.postIndex = (req, res) => {
     const { id, password } = req.body;
-
-    DB.query('SELECT * FROM Users WHERE id = ? AND password = ?', [id, password], (error, result, fields) => {
-        if(error){
-            console.error(err);
+    DB.query('SELECT isOnline FROM Users WHERE id = ?', [id], (err, result) => {
+        if(err){
+            console.error('Failed to check online status:', err);
             return res.status(500).json({ error: 'Server error' });
         }
-        if(result.length > 0){
-            req.session.userId = id;
-            res.status(200).json({ message: `Welcome ${id}`, success: true });
-
-            console.log(id, password);         // 로그인 성공 시 콘솔창에 아이디 비밀번호 입력 확인
-        }else{
-            res.status(401).json({ message: 'Invalid ID or password', success: false });
+        if(result.length > 0 && result[0].isOnline === 1){        // 이미 로그인 중인 경우
+            return res.status(400).json({ message: '해당 유저는 이미 로그인중입니다', success: false });
+        }else{                                                    // 로그인 실행
+            DB.query('SELECT * FROM Users WHERE id = ? AND password = ?', [id, password], (error, result, fields) => {
+                if(error){
+                    console.error('Failed to log in:', error);
+                    return res.status(500).json({ error: 'Server error' });
+                }
+                if(result.length > 0){
+                    req.session.userId = id;
+                    DB.query('UPDATE Users SET isOnline = 1 WHERE id = ?', [id], (updateErr) => {
+                        if(updateErr){
+                            console.error('Failed to update online status:', updateErr);
+                            return res.status(500).json({ error: 'Server error' });
+                        }
+                        res.status(200).json({ message: `Welcome ${id}`, success: true });
+                    });
+                    DB.query('SELECT id FROM Users WHERE isOnline = 1', (error, results) => {
+                        if(error){
+                            console.error('Failed to get online users:', error);
+                            return res.status(500).json({ error: 'Failed to retrieve online users' });
+                        }
+                        // 결과를 콘솔에 출력
+                        console.log('Online Users:', results);
+                    });
+                }else{
+                    res.status(401).json({ message: 'Invalid ID or password', success: false });
+                }
+            });
         }
+    });
+}
+
+
+// 로그아웃 실행
+exports.getlogOut = (req, res) => {
+    const id = req.session.userId;
+
+    req.session.destroy((err) => {
+        if(err){
+            console.error('Failed to destroy session during logout', err);
+            return res.status(500).json({ error: 'Failed to log out' });
+        }
+        DB.query('UPDATE Users SET isOnline = 0 WHERE id = ?', [id]);
+        // 세션이 성공적으로 파기되면 로그인 페이지로 리다이렉트
+        res.redirect('/');
     });
 }
 
@@ -73,7 +110,7 @@ exports.getchatpage = (req, res) => {
 };
 
 
-// 세션 정보 가져오기
+// 세션 정보 가져오기 -> chatpage 에서 사용
 exports.getsessionId = (req, res) => {
     if(req.session.userId){
         res.json({ userId: req.session.userId });
@@ -90,7 +127,7 @@ exports.getallUsers = (req, res) => {
             console.error('Failed to retrieve users:', err);
             return res.status(500).json({ error: 'Failed to retrieve users' });
         }
-        const filteredResults = results.filter(user => user.id !== req.session.userId); // 현재 로그인된 유저 제외
+        const filteredResults = results.filter(user => user.id !== req.session.userId); // 자신 제외
         res.json(filteredResults);
     });
 };

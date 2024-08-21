@@ -60,10 +60,24 @@ function leaveChat(){
 
 // "logout" 버튼 클릭 시
 document.getElementById('logoutBtn').onclick = function(){
-    window.location.href = '/';             // 초기 화면으로 이동
+    fetch('/getlogOut', { method: 'GET' })
+        .then(response => {
+            if(response.ok){
+                window.location.href = '/';
+            }else{
+                console.error('Failed to log out');
+            }
+        }
+    )
+    .catch(error => console.error('Error during logout:', error));
 }
 
 // "chat" 버튼 클릭 시
 document.getElementById('chatBtn').onclick = function(){
     window.location.href = '/chatpage';      // chatpage 로 이동
 }
+
+// 페이지 나갈 시에도 로그아웃
+window.addEventListener('beforeunload', function(event){
+    fetch('/getlogOut', { method: 'GET', keepalive: true });
+});

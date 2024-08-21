@@ -11,6 +11,8 @@ const isAuthenticated = require('../middlewares/authMiddleware');
 router.get('/', userController.getIndex);          // index.html 접속
 router.post('/', userController.postIndex);        // 로그인 진행
 
+router.get('/getlogOut', userController.getlogOut);  // 로그아웃 진행
+
 router.get('/signUp', userController.getsignUp);   // 회원가입 페이지 접속
 router.post('/signUp', userController.postsignUp); // 회원가입 진행
 

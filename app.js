@@ -73,12 +73,18 @@ app.use('/', userRouter);
 // socket.io 사용
 const connectedUsers = [];    // 소켓 (Chat) 접속중인 유저들
 let onlineUsers = [];         // Users 접속중인 온라인 유저들
+const socketToUserMap = {};
+
+function getSocketIdByUserId(username){  // 귓속말 대상 ID 와 소켓아이디 매핑 함수
+  return socketToUserMap[username];
+}
 
 io.on('connection', (socket) => {
   
   // Chat 입장 이벤트 처리
   socket.on('join', (username) => {
     connectedUsers[socket.id] = username;
+    socketToUserMap[username] = socket.id;
     io.emit('user update', { users: Object.values(connectedUsers) });
 
     const message = `${username}님이 입장`;
@@ -89,6 +95,7 @@ io.on('connection', (socket) => {
   socket.on('leave', (username) => {
     if(username){
       delete connectedUsers[socket.id];
+      delete socketToUserMap[username];
       io.emit('user update', { users: Object.values(connectedUsers) });
 
       const message = `${username}님이 퇴장`;
@@ -102,9 +109,28 @@ io.on('connection', (socket) => {
     const { username, message } = data;
     if (username && message){
         const formattedMessage = `${username}: ${message}`; // ID: message 형식으로 전송
-        io.emit('chat message', { message: formattedMessage, isSystem: false });
+        io.emit('chat message', { message: formattedMessage, isSystem: false, isPrivate: false });
     }
   });
+
+  // 귓속말 메세지 수신
+  socket.on('whisper', ({ targetUserId, username, privateMessage }) => {
+    const targetSocketId = getSocketIdByUserId(targetUserId); // 소켓아이디 매핑 함수 실행
+
+    if(targetSocketId){
+        io.to(targetSocketId).emit('chat message', { 
+            message: `귓속말 ${username}: ${privateMessage}`,
+            isSystem: false,
+            isPrivate: true,
+        });
+    }else{
+        socket.emit('chat message', {
+            message: `해당 사용자는 현재 오프라인입니다.`,
+            isSystem: true,
+            isPrivate: false
+        });
+    }
+});
 
 
   // Users 입장 이벤트

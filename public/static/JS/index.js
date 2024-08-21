@@ -18,18 +18,18 @@ function signIn(){
         },
         body: JSON.stringify({ id, password })
     })
-    .then(response => {         // 로그인 실패 시
-        if (!response.ok) {
-            throw new Error('Login failed');
+    .then(response => response.json())  // 서버의 응답을 JSON으로 파싱
+    .then(result => {
+        if(result.success){   // 로그인 성공
+            alert(result.message);
+            window.location.href = '/chatpage';
+        }else{                // 로그인 실패
+            alert(result.message);  // 서버에서 전달된 에러 메시지를 출력
         }
-        return response.json();
-    })
-    .then(result => {           // 로그인 성공 시
-        alert(result.message);
-        window.location.href = '/chatpage';
     })
     .catch(error => {
-        alert(error.message);
+        alert('로그인 요청 중 에러가 발생했습니다.');  // 기타 이유로 실패 시
+        console.error('Error during login request:', error);
     });
 }
 
