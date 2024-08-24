@@ -8,7 +8,7 @@ window.onload = function(){
     fetch('/getsessionId')
     .then(response => response.json())
     .then(data => {
-        if (data.userId){    // chatpage.html 에 세션 ID 표시
+        if(data.userId){    // chatpage.html 에 세션 ID 표시
             document.getElementById('sessionId').innerText = `Your ID: ${data.userId}`;
             username = data.userId;
         }else{
@@ -95,6 +95,7 @@ document.getElementById('sendMessage').onclick = function(){
             socket.emit('whisper', { targetUserId, username, privateMessage });
             messageInput.value = '';
         }
+        // 일반 메세지 전송
         else{
             socket.emit('chat message', { username, message }); // 서버로 메시지 전송
             messageInput.value = '';
@@ -116,6 +117,7 @@ messageForm.addEventListener('submit', function(event){
             socket.emit('whisper', { targetUserId, username, privateMessage });
             messageInput.value = '';
         }
+        // 일반 메세지 전송
         else{
             socket.emit('chat message', { username, message }); // 서버로 메시지 전송
             messageInput.value = '';
@@ -157,10 +159,25 @@ document.getElementById('usersBtn').onclick = function(){
         users.forEach(user => {
             const listItem = document.createElement('li');
             listItem.classList.add('user-item');
+            listItem.style.display = 'flex';
+            listItem.style.alignItems = 'center';
+            listItem.style.justifyContent = 'space-between';
+
 
             // 사용자 정보 스팬 생성
             const userInfo = document.createElement('span');
             userInfo.textContent = `ID: ${user.id}, 가입날짜: ${new Date(user.created_at).toLocaleDateString()}`;
+
+            // statusSpan 과 dm 버튼 -> Wrapper
+            const actionWrapper = document.createElement('div');
+            actionWrapper.style.display = 'flex';
+            actionWrapper.style.alignItems = 'center';
+
+            // online/offline 상태 표시
+            const statusSpan = document.createElement('span');
+            statusSpan.textContent = user.isOnline ? 'online' : 'offline';
+            statusSpan.style.color = user.isOnline ? 'green' : 'gray';
+            statusSpan.style.marginRight = '10px'; // 상태 스팬과 userInfo 사이의 간격
 
             // dm버튼 생성
             const dmButton = document.createElement('button');
@@ -174,9 +191,13 @@ document.getElementById('usersBtn').onclick = function(){
                 window.location.href = `/dmpage/${username}/${targetId}`;
             };
 
-            // li 요소에 스팬과 버튼 추가
+            // actionWrapper에 statusSpan과 dmButton 추가
+            actionWrapper.appendChild(statusSpan);
+            actionWrapper.appendChild(dmButton);
+
+            // listItem에 userInfo와 actionWrapper 추가
             listItem.appendChild(userInfo);
-            listItem.appendChild(dmButton);
+            listItem.appendChild(actionWrapper);
 
             // ul 요소에 li 추가
             usersList.appendChild(listItem);

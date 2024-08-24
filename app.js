@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000; // 포트 번호 설정
 // 모듈 설정
 const express = require('express');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const MySQLStore = require('express-mysql-session')(session);
 const path = require("path");
 const http = require('http');
@@ -48,13 +49,14 @@ const sessionStore = new MySQLStore({
 }, connection);
 
 // 세션 미들웨어 설정
+app.use(cookieParser());
 app.use(session({
   key: 'session_cookie_name',
     secret: 'sessionissecret!',
     store: sessionStore,
     resave: false,
-    saveUninitialized: false,
-    cookie: {secure: false},
+    saveUninitialized: true,
+    cookie: {secure: false, maxAge: 3600000},
 }));
 
 
@@ -75,7 +77,7 @@ const connectedUsers = [];    // 소켓 (Chat) 접속중인 유저들
 let onlineUsers = [];         // Users 접속중인 온라인 유저들
 const socketToUserMap = {};
 
-function getSocketIdByUserId(username){  // 귓속말 대상 ID 와 소켓아이디 매핑 함수
+function getSocketIdByUserId(username){  // 귓속말 대상 ID -> 소켓아이디 매핑 함수
   return socketToUserMap[username];
 }
 
@@ -116,13 +118,19 @@ io.on('connection', (socket) => {
   // 귓속말 메세지 수신
   socket.on('whisper', ({ targetUserId, username, privateMessage }) => {
     const targetSocketId = getSocketIdByUserId(targetUserId); // 소켓아이디 매핑 함수 실행
+    const me = getSocketIdByUserId(username);
 
     if(targetSocketId){
         io.to(targetSocketId).emit('chat message', { 
-            message: `귓속말 ${username}: ${privateMessage}`,
+            message: `(귓속말) ${username}: ${privateMessage}`,
             isSystem: false,
             isPrivate: true,
         });
+        io.to(me).emit('chat message', { 
+          message: `(귓속말) ${username}: ${privateMessage}`,
+          isSystem: false,
+          isPrivate: true,
+      });
     }else{
         socket.emit('chat message', {
             message: `해당 사용자는 현재 오프라인입니다.`,

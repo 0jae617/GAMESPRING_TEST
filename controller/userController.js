@@ -29,8 +29,9 @@ exports.postIndex = (req, res) => {
                     console.error('Failed to log in:', error);
                     return res.status(500).json({ error: 'Server error' });
                 }
-                if(result.length > 0){
+                if(result.length > 0){                            // 로그인 성공 시
                     req.session.userId = id;
+                    // isOnline 1로 설정
                     DB.query('UPDATE Users SET isOnline = 1 WHERE id = ?', [id], (updateErr) => {
                         if(updateErr){
                             console.error('Failed to update online status:', updateErr);
@@ -38,15 +39,16 @@ exports.postIndex = (req, res) => {
                         }
                         res.status(200).json({ message: `Welcome ${id}`, success: true });
                     });
+                    // isOnline 1인 유저들 콘솔에 표시
                     DB.query('SELECT id FROM Users WHERE isOnline = 1', (error, results) => {
                         if(error){
                             console.error('Failed to get online users:', error);
                             return res.status(500).json({ error: 'Failed to retrieve online users' });
                         }
-                        // 결과를 콘솔에 출력
+                        // 결과 콘솔에 출력
                         console.log('Online Users:', results);
                     });
-                }else{
+                }else{  // 아이디 OR 비밀번호 잘못됨
                     res.status(401).json({ message: 'Invalid ID or password', success: false });
                 }
             });
@@ -65,6 +67,7 @@ exports.getlogOut = (req, res) => {
             return res.status(500).json({ error: 'Failed to log out' });
         }
         DB.query('UPDATE Users SET isOnline = 0 WHERE id = ?', [id]);
+
         // 세션이 성공적으로 파기되면 로그인 페이지로 리다이렉트
         res.redirect('/');
     });
@@ -103,14 +106,14 @@ exports.postsignUp = (req, res) => {
 
 // 채팅 페이지 접속
 exports.getchatpage = (req, res) => {
-    if(!req.session.userId){
+    if(!req.session || !req.session.userId){
         return res.redirect('/');   // 세션 없으면 index로 redirect
     }
     res.sendFile(path.join(__dirname, '../public/views/chatpage.html'));
 };
 
 
-// 세션 정보 가져오기 -> chatpage 에서 사용
+// 세션 정보 가져오기
 exports.getsessionId = (req, res) => {
     if(req.session.userId){
         res.json({ userId: req.session.userId });
@@ -122,7 +125,7 @@ exports.getsessionId = (req, res) => {
 
 // Users 정보 가져오기
 exports.getallUsers = (req, res) => {
-    DB.query("SELECT id, created_at FROM Users", (err, results) => {
+    DB.query("SELECT id, created_at, isOnline FROM Users", (err, results) => {
         if(err){
             console.error('Failed to retrieve users:', err);
             return res.status(500).json({ error: 'Failed to retrieve users' });
@@ -135,5 +138,8 @@ exports.getallUsers = (req, res) => {
 
 // DM 창 불러오기
 exports.getdmpage = (req, res) => {
+    if(!req.session.userId){
+        return res.redirect('/');   // 세션이 없으면 index로 리다이렉트
+    }
     res.sendFile(path.join(__dirname, '../public/views/dmpage.html'));
 }

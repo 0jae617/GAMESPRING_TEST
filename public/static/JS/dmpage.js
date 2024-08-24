@@ -2,6 +2,27 @@
 "use strict";
 console.log("dmpage.js operating successfully!");
 
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/getsessionId', {
+        method: 'GET',
+        credentials: 'include' // 세션 쿠키를 포함하여 요청
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.userId){
+            // 세션이 유효한 경우 사용자 정보를 표시하거나 DM 내역을 불러옴
+            console.log(`Logged in as ${data.userId}`);
+        }else{
+            // 세션이 없으면 로그인 페이지로 리다이렉트
+            alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+            window.location.href = '/';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching session data:', error);
+    });
+});
+
 const socket = io();
 
 // 현재 URL에서 유저 정보를 추출
