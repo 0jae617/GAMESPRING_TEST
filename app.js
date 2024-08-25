@@ -55,8 +55,8 @@ app.use(session({
     secret: 'sessionissecret!',
     store: sessionStore,
     resave: false,
-    saveUninitialized: true,
-    cookie: {secure: false, maxAge: 3600000},
+    saveUninitialized: false,
+    cookie: {secure: false, maxAge: 3600000, path: '/', sameSite: 'Lax'},
 }));
 
 

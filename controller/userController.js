@@ -74,6 +74,19 @@ exports.getlogOut = (req, res) => {
 }
 
 
+// 페이지 나갈 시 isOnline만 0으로
+exports.getpageOut = (req, res) => {
+    const id = req.session.userId;
+    DB.query('UPDATE Users SET isOnline = 0 WHERE id = ?', [id]);
+
+}
+
+exports.getpageIn = (req, res) => {  // 페이지 들어오면 다시 isOnline 1로
+    const id = req.session.userId;
+    DB.query('UPDATE Users SET isOnline = 1 WHERE id = ?', [id]);
+}
+
+
 // 회원가입 페이지 접속
 exports.getsignUp = (req, res) => {
     res.sendFile(path.join(__dirname, '../public/views/signUp.html'))
@@ -141,5 +154,6 @@ exports.getdmpage = (req, res) => {
     if(!req.session.userId){
         return res.redirect('/');   // 세션이 없으면 index로 리다이렉트
     }
+
     res.sendFile(path.join(__dirname, '../public/views/dmpage.html'));
 }

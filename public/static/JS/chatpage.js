@@ -5,7 +5,10 @@
 let username;
 
 window.onload = function(){
-    fetch('/getsessionId')
+    fetch('/getsessionId', {
+        method: 'GET',
+        credentials: 'include' // 세션 쿠키를 포함하여 요청
+    })
     .then(response => response.json())
     .then(data => {
         if(data.userId){    // chatpage.html 에 세션 ID 표시
@@ -16,6 +19,8 @@ window.onload = function(){
         }
     })
     .catch(error => console.error('Error:', error));
+
+    fetch('/getpageIn');
 };
 
 
@@ -222,7 +227,8 @@ document.getElementById('logoutBtn').onclick = function(){
     .catch(error => console.error('Error during logout:', error));
 }
 
-// 페이지 나갈 시에도 로그아웃
+
+// 페이지 나갈 시에는 isOnline만 0으로
 window.addEventListener('beforeunload', function(event){
-    fetch('/getlogOut', { method: 'GET', keepalive: true });
+    fetch('/getpageOut', { method: 'GET', keepalive: true });
 });
