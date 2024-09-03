@@ -25,9 +25,9 @@ const io = socketIO(server);
 
 // 세션 DB 설정
 const connection = mysql.createConnection({
-  host: 'jayspringchat.ch2csciqyk85.ap-northeast-2.rds.amazonaws.com',
-  user: 'admin',
-  password: 'MySQLpassword',
+  host: 'localhost',
+  user: 'root',
+  password: 'dudwo@03',
   database: 'session_db',
 });
 connection.connect(err => {
